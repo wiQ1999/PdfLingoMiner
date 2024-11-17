@@ -34,6 +34,10 @@ public class SearchResult {
         return occurrenceCount;
     }
 
+    public boolean getIsSearched() {
+        return isSearched;
+    }
+
     public void addOccurrence() {
         occurrenceCount++;
         isSearched = true;

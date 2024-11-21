@@ -1,6 +1,6 @@
 package pl.wiktorszczeszek.core.domain;
 
-public class PdfFile {
+public class PdfFile implements Comparable<PdfFile> {
     private final String path;
 
     public PdfFile(String path) {
@@ -11,6 +11,11 @@ public class PdfFile {
 
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public int compareTo(PdfFile o) {
+        return path.compareToIgnoreCase(o.path);
     }
 
     @Override

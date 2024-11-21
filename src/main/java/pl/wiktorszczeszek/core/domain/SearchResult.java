@@ -2,7 +2,7 @@ package pl.wiktorszczeszek.core.domain;
 
 import java.util.Objects;
 
-public class SearchResult {
+public class SearchResult implements Comparable<SearchResult> {
     private final PdfFile file;
     private final SearchPhrase phrase;
     private int occurrenceCount;
@@ -52,6 +52,11 @@ public class SearchResult {
     public void reset() {
         occurrenceCount = 0;
         isSearched = false;
+    }
+
+    @Override
+    public int compareTo(SearchResult o) {
+        return file.compareTo(o.getFile());
     }
 
     @Override

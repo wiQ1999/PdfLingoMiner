@@ -27,9 +27,13 @@ public class SearchContext {
         results.replaceAll((f, _) -> new SearchResult(f, value));
     }
 
+    public void clearFiles() {
+        results.clear();
+    }
+
     public int clearAndSetFiles(PdfFile[] files) {
         if (files == null || files.length == 0) throw new IllegalArgumentException("Kolekcja plików nie może być pusta.");
-        results.clear();
+        clearFiles();
         return addFiles(files);
     }
 

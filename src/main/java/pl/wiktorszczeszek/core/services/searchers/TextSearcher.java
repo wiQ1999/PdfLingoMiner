@@ -3,6 +3,8 @@ package pl.wiktorszczeszek.core.services.searchers;
 import org.springframework.util.StringUtils;
 import pl.wiktorszczeszek.core.domain.SearchPhrase;
 
+import java.util.regex.Pattern;
+
 public class TextSearcher implements PhraseCountSearcher {
     private SearchPhrase phrase;
 
@@ -20,6 +22,8 @@ public class TextSearcher implements PhraseCountSearcher {
 
     @Override
     public int search(String text) {
-        return StringUtils.countOccurrencesOf(text, phrase.getPhrase());
+        return (int) Pattern.compile(phrase.getPhrase(), Pattern.CASE_INSENSITIVE)
+                .splitAsStream(text)
+                .count() - 1;
     }
 }

@@ -10,12 +10,9 @@ import pl.wiktorszczeszek.ui.controllers.MainController;
 
 public class Main {
     public static void main(String[] args) {
-        // Tworzenie instancji serwisów
         LocalFileLocator fileService = new LocalPdfFilesLocator();
         TotalTextReader readerService = new PdfBoxReader();
         PhraseCountSearcher searchService = new TextSearcher();
-
-        // Inicjalizacja kontrolera głównego
         new MainController(fileService, readerService, searchService);
     }
 }

@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultTableModel extends AbstractTableModel {
-    private List<SearchResult> results = new ArrayList<>();
-
     private final String[] columnNames = {"Plik", "Liczba wystąpień"};
+    private List<SearchResult> results = new ArrayList<>();
 
     public void setResults(List<SearchResult> results) {
         this.results = results;

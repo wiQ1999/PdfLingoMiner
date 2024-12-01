@@ -9,22 +9,12 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class MainFrame extends JFrame {
-    private JPanel mainPanel;
-    private JPanel filesPanel;
-    private JPanel browsePanel;
-    private JPanel centerGapPanel;
-    private JPanel resultPanel;
-    private JPanel searchPanel;
-
-    private SelectedFilesTableModel filesModel;
-    private JTable filesTable;
-
-    private JButton browseButton;
+    private JPanel mainPanel, filesPanel, browsePanel, centerGapPanel, resultPanel, searchPanel;
+    private JTable filesTable, resultsTable;
+    private JButton browseButton, removeButton, searchButton;
     private JTextField phraseField;
-    private JButton searchButton;
-
+    private SelectedFilesTableModel filesModel;
     private SearchResultTableModel resultsModel;
-    private JTable resultsTable;
 
     public MainFrame() {
         setTitle("PDF Lingo Miner");
@@ -40,8 +30,13 @@ public class MainFrame extends JFrame {
 
         browsePanel = (JPanel) filesPanel.add(new JPanel());
         browsePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        browsePanel.add(new JLabel("Wskaż lokalizację wyszukiwania"));
-        browseButton = (JButton) browsePanel.add(new JButton("Przeglądaj"));
+        browsePanel.add(new JLabel("Lista plików lokalych"));
+        browseButton = (JButton) browsePanel.add(new JButton("Dodaj pliki"));
+        removeButton = (JButton) browsePanel.add(new JButton("Usuń pliki"));
+        removeButton.addActionListener(_ -> {
+            int[] indexes = filesTable.getSelectedRows();
+            filesModel.removeRows(indexes);
+        });
 
         filesModel = new SelectedFilesTableModel();
         filesTable = new JTable(filesModel);

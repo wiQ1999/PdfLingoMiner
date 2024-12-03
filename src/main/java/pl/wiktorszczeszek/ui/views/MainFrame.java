@@ -5,6 +5,7 @@ import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -86,6 +87,9 @@ public class MainFrame extends JFrame {
         gbc.weighty = 1.0;
         resultsModel = new SearchResultTableModel();
         resultsTable = new JTable(resultsModel);
+        TableColumn column = resultsTable.getColumnModel().getColumn(1);
+        column.setMinWidth(110);
+        column.setMaxWidth(110);
         JScrollPane resultsPane = new JScrollPane(resultsTable);
         add(resultsPane, gbc);
 

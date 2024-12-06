@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class MainFrame extends JFrame {
-    private final Dimension buttonDimension = new Dimension(100, 30);
+    private final Dimension buttonDimension = new Dimension(120, 30);
     private JTable filesTable, resultsTable;
     private JButton browseButton, removeButton, searchButton;
     private JTextField phraseField;
@@ -40,10 +40,10 @@ public class MainFrame extends JFrame {
         gbc.weighty = 0.0;
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        browseButton = new JButton("Dodaj pliki");
+        browseButton = new JButton("Dodaj do listy");
         browseButton.setPreferredSize(buttonDimension);
         searchPanel.add(browseButton);
-        removeButton = new JButton("Usuń pliki");
+        removeButton = new JButton("Usuń z listy");
         removeButton.setPreferredSize(buttonDimension);
         removeButton.addActionListener(_ -> {
             int[] indexes = filesTable.getSelectedRows();

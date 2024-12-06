@@ -48,11 +48,4 @@ public class SelectedFilesTableModel extends AbstractTableModel {
         if (columnIndex == 0) return String.class;
         else return Object.class;
     }
-
-    public void removeRows(int[] indexes) {
-        for (int i : indexes) {
-            this.files.remove(i);
-        }
-        fireTableDataChanged();
-    }
 }

@@ -10,8 +10,6 @@ import pl.wiktorszczeszek.core.services.searchers.PhraseCountSearcher;
 import pl.wiktorszczeszek.ui.views.MainFrame;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,12 +28,8 @@ public class MainController {
         searchContext = new SearchContext();
         mainFrame = new MainFrame();
         mainFrame.addBrowseButtonListener(e -> selectLocalFiles());
-        mainFrame.addSearchButtonListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                performSearch();
-            }
-        });
+        mainFrame.addRemoveButtonListener(e -> removeFiles());
+        mainFrame.addSearchButtonListener(e -> performSearch());
     }
 
     private void selectLocalFiles() {
@@ -58,16 +52,39 @@ public class MainController {
                 }
             }
 
-            paths = searchContext.getFiles().stream()
-                    .map(PdfFile::getPath)
-                    .collect(Collectors.toList());
+            paths = getSortedPaths();
 
             Collections.sort(paths);
             mainFrame.setFiles(paths);
+            mainFrame.setSearchCapacity(paths.size());
         }
     }
 
+    private void removeFiles() {
+        int[] indexes = mainFrame.getSelectedFileIndexes();
+        ArrayList<PdfFile> toRemove = new ArrayList<>(indexes.length);
+        for (int index : indexes) {
+            ArrayList<PdfFile> files = new ArrayList<>(searchContext.getFiles());
+            PdfFile file = files.get(index);
+            toRemove.add(file);
+        }
+        PdfFile[] toRemoveArray = toRemove.toArray(new PdfFile[0]);
+        searchContext.removeFiles(toRemoveArray);
+        List<String> paths = getSortedPaths();
+        mainFrame.setFiles(paths);
+        mainFrame.setSearchCapacity(paths.size());
+    }
+
+    private List<String> getSortedPaths() {
+        List<String> paths = searchContext.getFiles().stream()
+                .map(PdfFile::getPath)
+                .collect(Collectors.toList());
+        Collections.sort(paths);
+        return paths;
+    }
+
     private void performSearch() {
+        mainFrame.setSearchedCount(0);
         String phraseText = mainFrame.getPhraseFieldText();
 
         SearchPhrase phrase = new SearchPhrase(phraseText);
@@ -80,7 +97,7 @@ public class MainController {
             return;
         }
 
-        Set<PdfFile> filesToSearch = new HashSet<>(searchContext.getFiles());
+        ArrayList<PdfFile> filesToSearch = new ArrayList<>(searchContext.getFiles());
         if (filesToSearch.isEmpty()) {
             JOptionPane.showMessageDialog(
                     mainFrame,
@@ -91,17 +108,25 @@ public class MainController {
         }
 
         try {
-            SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            SwingWorker<Void, Integer> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() throws Exception {
                     searchService.setSearchPhrase(phrase);
-                    for (PdfFile file : filesToSearch) {
+                    for (int i = 0; i < filesToSearch.size(); i++) {
+                        PdfFile file = filesToSearch.get(i);
                         String text = readerService.allText(file);
                         int occurrence = searchService.search(text);
                         SearchResult result = new SearchResult(file, phrase, occurrence);
                         searchContext.updateSearchResult(result);
+                        publish(i + 1);
                     }
                     return null;
+                }
+
+                @Override
+                protected void process(List<Integer> chunks) {
+                    int last = chunks.getLast();
+                    mainFrame.setSearchedCount(last);
                 }
 
                 @Override

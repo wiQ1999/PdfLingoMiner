@@ -1,12 +1,9 @@
 package pl.wiktorszczeszek.core.domain;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SearchContext {
-    private final Map<PdfFile, SearchResult> results = new HashMap<>();
+    private final Map<PdfFile, SearchResult> results = new TreeMap<>();
     private SearchPhrase searchPhrase = new SearchPhrase();
 
     public Collection<PdfFile> getFiles() {

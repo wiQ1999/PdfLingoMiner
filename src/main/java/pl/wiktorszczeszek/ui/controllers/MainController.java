@@ -52,9 +52,8 @@ public class MainController {
                 }
             }
 
-            paths = getSortedPaths();
+            paths = getPaths();
 
-            Collections.sort(paths);
             mainFrame.setFiles(paths);
             mainFrame.setSearchCapacity(paths.size());
         }
@@ -70,17 +69,15 @@ public class MainController {
         }
         PdfFile[] toRemoveArray = toRemove.toArray(new PdfFile[0]);
         searchContext.removeFiles(toRemoveArray);
-        List<String> paths = getSortedPaths();
+        List<String> paths = getPaths();
         mainFrame.setFiles(paths);
         mainFrame.setSearchCapacity(paths.size());
     }
 
-    private List<String> getSortedPaths() {
-        List<String> paths = searchContext.getFiles().stream()
+    private List<String> getPaths() {
+        return searchContext.getFiles().stream()
                 .map(PdfFile::getPath)
                 .collect(Collectors.toList());
-        Collections.sort(paths);
-        return paths;
     }
 
     private void performSearch() {
@@ -134,7 +131,6 @@ public class MainController {
                     List<SearchResult> results = searchContext.getResults()
                             .stream()
                             .filter(result -> result.getOccurrenceCount() > 0)
-                            .sorted()
                             .collect(Collectors.toList());
                     mainFrame.setResults(results);
                 }

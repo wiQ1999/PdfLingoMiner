@@ -148,3 +148,4 @@ target
 .gradle
 README.html
 .exercism
+/installer/*.exe

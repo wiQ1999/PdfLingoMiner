@@ -1,6 +1,7 @@
 package pl.wiktorszczeszek.core.domain;
 
 public class SearchPhrase {
+    private static final int maxPhraseLength = 100;
     private final String phrase;
 
     public SearchPhrase() {
@@ -17,7 +18,7 @@ public class SearchPhrase {
     }
 
     public boolean isValid() {
-        return phrase.length() > 1 && phrase.length() < 101;
+        return phrase.length() > 1 && phrase.length() <= maxPhraseLength;
     }
 
     @Override

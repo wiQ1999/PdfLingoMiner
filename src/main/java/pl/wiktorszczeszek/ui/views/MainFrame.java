@@ -3,9 +3,9 @@ package pl.wiktorszczeszek.ui.views;
 import pl.wiktorszczeszek.core.domain.SearchResult;
 import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
+import pl.wiktorszczeszek.ui.tables.ResizableTable;
 
 import javax.swing.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -14,7 +14,7 @@ public class MainFrame extends JFrame {
     private final Dimension buttonDimension = new Dimension(120, 30);
     private final Font title = new Font("Arial", Font.BOLD, 20);
     private final Font info = new Font("Arial", Font.ITALIC, 14);
-    private JTable filesTable, resultsTable;
+    private ResizableTable filesTable, resultsTable;
     private JButton browseButton, removeButton, searchButton;
     private JTextField phraseField;
     private SelectedFilesTableModel filesModel;
@@ -58,8 +58,9 @@ public class MainFrame extends JFrame {
         gbc.weightx = 0.4;
         gbc.weighty = 1.0;
         filesModel = new SelectedFilesTableModel();
-        filesTable = new JTable(filesModel);
-        JScrollPane filesPane = new JScrollPane(filesTable);
+        filesTable = new ResizableTable(filesModel);
+        filesTable.adjustColumnsWidthToHeaders();
+        JScrollPane filesPane = new JScrollPane(filesTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(filesPane, gbc);
 
         gbc.gridx = 1;
@@ -93,11 +94,9 @@ public class MainFrame extends JFrame {
         gbc.weightx = 0.6;
         gbc.weighty = 1.0;
         resultsModel = new SearchResultTableModel();
-        resultsTable = new JTable(resultsModel);
-        TableColumn column = resultsTable.getColumnModel().getColumn(1);
-        column.setMinWidth(110);
-        column.setMaxWidth(110);
-        JScrollPane resultsPane = new JScrollPane(resultsTable);
+        resultsTable = new ResizableTable(resultsModel);
+        resultsTable.adjustColumnsWidthToHeaders();
+        JScrollPane resultsPane = new JScrollPane(resultsTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(resultsPane, gbc);
 
         pack();
@@ -123,6 +122,7 @@ public class MainFrame extends JFrame {
 
     public void setFiles(java.util.List<String> files) {
         filesModel.setRows(files);
+        filesTable.adjustColumnWidth(0);
     }
 
     public String getPhraseFieldText() {
@@ -131,6 +131,7 @@ public class MainFrame extends JFrame {
 
     public void setResults(java.util.List<SearchResult> results) {
         resultsModel.setResults(results);
+        resultsTable.adjustColumnWidth(1);
     }
 
     public void setSearchCapacity(int value) {

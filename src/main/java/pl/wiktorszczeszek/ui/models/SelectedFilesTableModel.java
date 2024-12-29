@@ -34,18 +34,16 @@ public class SelectedFilesTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (rowIndex < 0 || rowIndex >= files.size()) {
-            return null;
-        }
+        if (rowIndex < 0 || rowIndex >= files.size()) return null;
 
         String file = files.get(rowIndex);
         if (columnIndex == 0) return file;
-        else return  null;
+        return  null;
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 0) return String.class;
-        else return Object.class;
+        return Object.class;
     }
 }

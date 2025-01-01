@@ -67,6 +67,9 @@ public class MainController {
             PdfFile file = files.get(index);
             toRemove.add(file);
         }
+
+        if (toRemove.isEmpty()) return;
+
         PdfFile[] toRemoveArray = toRemove.toArray(new PdfFile[0]);
         searchContext.removeFiles(toRemoveArray);
         List<String> paths = getPaths();

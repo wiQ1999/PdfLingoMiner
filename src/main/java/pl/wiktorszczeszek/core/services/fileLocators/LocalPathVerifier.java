@@ -1,4 +1,4 @@
-package pl.wiktorszczeszek.core.services.fileLoctors;
+package pl.wiktorszczeszek.core.services.fileLocators;
 
 public interface LocalPathVerifier {
     boolean isExist(String path);

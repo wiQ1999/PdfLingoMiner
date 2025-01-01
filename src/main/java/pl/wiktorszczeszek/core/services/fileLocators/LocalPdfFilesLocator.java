@@ -1,4 +1,4 @@
-package pl.wiktorszczeszek.core.services.fileLoctors;
+package pl.wiktorszczeszek.core.services.fileLocators;
 
 import pl.wiktorszczeszek.core.domain.PdfFile;
 

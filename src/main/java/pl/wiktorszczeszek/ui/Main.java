@@ -1,7 +1,7 @@
 package pl.wiktorszczeszek.ui;
 
-import pl.wiktorszczeszek.core.services.fileLoctors.LocalFileLocator;
-import pl.wiktorszczeszek.core.services.fileLoctors.LocalPdfFilesLocator;
+import pl.wiktorszczeszek.core.services.fileLocators.LocalFileLocator;
+import pl.wiktorszczeszek.core.services.fileLocators.LocalPdfFilesLocator;
 import pl.wiktorszczeszek.core.services.fileReaders.PdfBoxReader;
 import pl.wiktorszczeszek.core.services.fileReaders.TotalTextReader;
 import pl.wiktorszczeszek.core.services.searchers.PhraseCountSearcher;

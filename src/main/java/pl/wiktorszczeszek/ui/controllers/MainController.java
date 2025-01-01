@@ -4,7 +4,7 @@ import pl.wiktorszczeszek.core.domain.PdfFile;
 import pl.wiktorszczeszek.core.domain.SearchContext;
 import pl.wiktorszczeszek.core.domain.SearchPhrase;
 import pl.wiktorszczeszek.core.domain.SearchResult;
-import pl.wiktorszczeszek.core.services.fileLoctors.LocalFileLocator;
+import pl.wiktorszczeszek.core.services.fileLocators.LocalFileLocator;
 import pl.wiktorszczeszek.core.services.fileReaders.TotalTextReader;
 import pl.wiktorszczeszek.core.services.searchers.PhraseCountSearcher;
 import pl.wiktorszczeszek.ui.views.MainFrame;

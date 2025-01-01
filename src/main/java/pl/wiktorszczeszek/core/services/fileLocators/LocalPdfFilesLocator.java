@@ -1,4 +1,4 @@
-package pl.wiktorszczeszek.core.services.fileLoctors;
+package pl.wiktorszczeszek.core.services.fileLocators;
 
 import pl.wiktorszczeszek.core.domain.PdfFile;
 
@@ -30,7 +30,10 @@ public class LocalPdfFilesLocator implements LocalFileLocator {
     }
 
     private void searchFilesInSubFolders(File folder, Collection<PdfFile> files) {
-        for (File subFile : folder.listFiles()) {
+        File[] listed = folder.listFiles();
+        if (listed == null) return;
+
+        for (File subFile : listed) {
             if (subFile.isDirectory()) {
                 searchFilesInSubFolders(subFile, files);
             } else {

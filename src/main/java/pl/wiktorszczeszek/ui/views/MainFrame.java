@@ -1,6 +1,7 @@
 package pl.wiktorszczeszek.ui.views;
 
 import pl.wiktorszczeszek.core.domain.SearchResult;
+import pl.wiktorszczeszek.ui.buttons.ActionCancelButton;
 import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
 import pl.wiktorszczeszek.ui.tables.ResizableTable;
@@ -11,11 +12,13 @@ import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 
 public class MainFrame extends JFrame {
-    private final Dimension buttonDimension = new Dimension(120, 30);
+    private final Dimension largeButtonDimension = new Dimension(120, 30);
+    private final Dimension mediumButtonDimension = new Dimension(80, 30);
     private final Font title = new Font("Arial", Font.BOLD, 20);
     private final Font info = new Font("Arial", Font.ITALIC, 14);
     private ResizableTable filesTable, resultsTable;
-    private JButton browseButton, removeButton, searchButton;
+    private JButton browseButton, removeButton;
+    private ActionCancelButton searchButton;
     private JTextField phraseField;
     private SelectedFilesTableModel filesModel;
     private SearchResultTableModel resultsModel;
@@ -46,10 +49,10 @@ public class MainFrame extends JFrame {
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         browseButton = new JButton("Dodaj do listy");
-        browseButton.setPreferredSize(buttonDimension);
+        browseButton.setPreferredSize(largeButtonDimension);
         searchPanel.add(browseButton);
         removeButton = new JButton("Usuń z listy");
-        removeButton.setPreferredSize(buttonDimension);
+        removeButton.setPreferredSize(largeButtonDimension);
         searchPanel.add(removeButton);
         add(searchPanel, gbc);
 
@@ -85,7 +88,8 @@ public class MainFrame extends JFrame {
         resultPanel.setLayout(new BorderLayout(5, 5));
         phraseField = new JTextField();
         resultPanel.add(phraseField, BorderLayout.CENTER);
-        searchButton = new JButton("Szukaj");
+        searchButton = new ActionCancelButton("Szukaj");
+        searchButton.setPreferredSize(mediumButtonDimension);
         resultPanel.add(searchButton, BorderLayout.EAST);
         add(resultPanel, gbc);
 
@@ -112,8 +116,12 @@ public class MainFrame extends JFrame {
         removeButton.addActionListener(listener);
     }
 
-    public void addSearchButtonListener(ActionListener listener) {
-        searchButton.addActionListener(listener);
+    public void addPerformSearchButtonListener(ActionListener listener) {
+        searchButton.addPerformActionListener(listener);
+    }
+
+    public void addCancelSearchButtonListener(ActionListener listener) {
+        searchButton.addCancelActionListener(listener);
     }
 
     public int[] getSelectedFileIndexes() {
@@ -142,6 +150,10 @@ public class MainFrame extends JFrame {
     public void setSearchedCount(int value) {
         this.searchedCount = value;
         updateProcessLabel();
+    }
+
+    public void setSearchButtonToSearch() {
+        searchButton.setSelected(false);
     }
 
     private void updateProcessLabel() {

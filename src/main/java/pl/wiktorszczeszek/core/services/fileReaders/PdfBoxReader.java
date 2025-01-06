@@ -12,7 +12,7 @@ public class PdfBoxReader implements TotalTextReader {
     @Override
     public String allText(PdfFile file) {
         String text = "";
-        try (PDDocument document = Loader.loadPDF(new File(file.getPath()))) {
+        try (PDDocument document = Loader.loadPDF(new File(file.path()))) {
             if (document == null || document.isEncrypted()) {
                 return text;
             }

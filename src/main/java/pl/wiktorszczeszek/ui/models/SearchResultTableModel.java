@@ -43,7 +43,7 @@ public class SearchResultTableModel extends AbstractTableModel {
         SearchResult result = results.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return result.getFile().getPath();
+                return result.getFile().path();
             case 1:
                 return result.getOccurrenceCount();
             default:

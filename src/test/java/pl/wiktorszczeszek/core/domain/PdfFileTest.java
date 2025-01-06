@@ -22,7 +22,7 @@ public class PdfFileTest {
     @Test
     void getPath_ShouldReturnTrimmedPath() {
         PdfFile pdfFile = new PdfFile("   /path/to/file.pdf   ");
-        assertEquals("/path/to/file.pdf", pdfFile.getPath());
+        assertEquals("/path/to/file.pdf", pdfFile.path());
     }
 
     @Test

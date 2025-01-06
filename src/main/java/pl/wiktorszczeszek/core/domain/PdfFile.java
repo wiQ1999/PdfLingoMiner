@@ -1,16 +1,10 @@
 package pl.wiktorszczeszek.core.domain;
 
-public class PdfFile implements Comparable<PdfFile> {
-    private final String path;
-
+public record PdfFile(String path) implements Comparable<PdfFile> {
     public PdfFile(String path) {
         if (path == null) throw new IllegalArgumentException("Ścieżka do pliku nie może być null.");
         this.path = path.trim();
         if (this.path.isEmpty()) throw new IllegalArgumentException("Ścieżka do pliku nie może być pusta.");
-    }
-
-    public String getPath() {
-        return path;
     }
 
     @Override

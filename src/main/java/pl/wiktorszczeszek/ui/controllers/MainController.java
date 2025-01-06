@@ -76,7 +76,7 @@ public class MainController {
 
     private List<String> getPaths() {
         return searchContext.getFiles().stream()
-                .map(PdfFile::getPath)
+                .map(PdfFile::path)
                 .collect(Collectors.toList());
     }
 

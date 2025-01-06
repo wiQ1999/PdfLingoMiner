@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Plik", "Liczba wystąpień"};
+    private final String[] columnNames = {"W treści", "Plik"};
     private List<TextContentSearch> results = new ArrayList<>();
 
     public void setResults(List<TextContentSearch> results) {
@@ -41,25 +41,16 @@ public class SearchResultTableModel extends AbstractTableModel {
         }
 
         TextContentSearch result = results.get(rowIndex);
-        switch (columnIndex) {
-            case 0:
-                return result.getFile().path();
-            case 1:
-                return result.getOccurrenceCount();
-            default:
-                return null;
-        }
+        return switch (columnIndex) {
+            case 0 -> result.getOccurrenceCount();
+            case 1 -> result.getFile().path();
+            default -> null;
+        };
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return String.class;
-            case 1:
-                return Integer.class;
-            default:
-                return Object.class;
-        }
+        if (columnIndex == 1) return String.class;
+        return Object.class;
     }
 }

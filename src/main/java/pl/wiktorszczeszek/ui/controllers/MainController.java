@@ -4,7 +4,7 @@ import pl.wiktorszczeszek.core.domain.PdfFile;
 import pl.wiktorszczeszek.core.domain.SearchContext;
 import pl.wiktorszczeszek.core.domain.SearchPhrase;
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
-import pl.wiktorszczeszek.core.services.fileLoctors.LocalFileLocator;
+import pl.wiktorszczeszek.core.services.fileLocators.LocalFileLocator;
 import pl.wiktorszczeszek.core.services.fileReaders.TotalTextReader;
 import pl.wiktorszczeszek.core.services.searchers.PhraseCountSearcher;
 import pl.wiktorszczeszek.ui.views.MainFrame;
@@ -20,6 +20,7 @@ public class MainController {
     private PhraseCountSearcher searchService;
     private SearchContext searchContext;
     private MainFrame mainFrame;
+    private SwingWorker<Void, Integer> searchWorker;
 
     public MainController(LocalFileLocator fileService, TotalTextReader readerService, PhraseCountSearcher searchService) {
         this.fileService = fileService;
@@ -27,9 +28,10 @@ public class MainController {
         this.searchService = searchService;
         searchContext = new SearchContext();
         mainFrame = new MainFrame();
-        mainFrame.addBrowseButtonListener(e -> selectLocalFiles());
-        mainFrame.addRemoveButtonListener(e -> removeFiles());
-        mainFrame.addSearchButtonListener(e -> performSearch());
+        mainFrame.addBrowseButtonListener(_ -> selectLocalFiles());
+        mainFrame.addRemoveButtonListener(_ -> removeFiles());
+        mainFrame.addPerformSearchButtonListener(_ -> performSearch());
+        mainFrame.addCancelSearchButtonListener(_ -> cancelSearch());
     }
 
     private void selectLocalFiles() {
@@ -67,6 +69,9 @@ public class MainController {
             PdfFile file = files.get(index);
             toRemove.add(file);
         }
+
+        if (toRemove.isEmpty()) return;
+
         PdfFile[] toRemoveArray = toRemove.toArray(new PdfFile[0]);
         searchContext.removeFiles(toRemoveArray);
         List<String> paths = getPaths();
@@ -91,6 +96,7 @@ public class MainController {
                     "Nieprawidłowa fraza wyszukiwania.",
                     "Błąd",
                     JOptionPane.ERROR_MESSAGE);
+            mainFrame.setSearchButtonToSearch();
             return;
         }
 
@@ -101,15 +107,17 @@ public class MainController {
                     "Nie wybrano plików do przeszukania.",
                     "Błąd",
                     JOptionPane.ERROR_MESSAGE);
+            mainFrame.setSearchButtonToSearch();
             return;
         }
 
         try {
-            SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+            searchWorker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() throws Exception {
                     searchService.setSearchPhrase(phrase);
                     for (int i = 0; i < filesToSearch.size(); i++) {
+                        if (isCancelled()) break;
                         PdfFile file = filesToSearch.get(i);
                         String text = readerService.allText(file);
                         int occurrence = searchService.search(text);
@@ -133,9 +141,10 @@ public class MainController {
                             .filter(result -> result.getOccurrenceCount() > 0)
                             .collect(Collectors.toList());
                     mainFrame.setResults(results);
+                    mainFrame.setSearchButtonToSearch();
                 }
             };
-            worker.execute();
+            searchWorker.execute();
 
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(
@@ -143,6 +152,13 @@ public class MainController {
                     ex.getMessage(),
                     "Wystąpił błąd podczas wyszukiwania",
                     JOptionPane.ERROR_MESSAGE);
+            mainFrame.setSearchButtonToSearch();
+        }
+    }
+
+    private void cancelSearch() {
+        if (searchWorker != null && !searchWorker.isDone()) {
+            searchWorker.cancel(true);
         }
     }
 }

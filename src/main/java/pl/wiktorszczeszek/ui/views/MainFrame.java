@@ -1,21 +1,24 @@
 package pl.wiktorszczeszek.ui.views;
 
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
+import pl.wiktorszczeszek.ui.buttons.ActionCancelButton;
 import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
+import pl.wiktorszczeszek.ui.tables.ResizableTable;
 
 import javax.swing.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 
 public class MainFrame extends JFrame {
-    private final Dimension buttonDimension = new Dimension(120, 30);
+    private final Dimension largeButtonDimension = new Dimension(120, 30);
+    private final Dimension mediumButtonDimension = new Dimension(80, 30);
     private final Font title = new Font("Arial", Font.BOLD, 20);
     private final Font info = new Font("Arial", Font.ITALIC, 14);
-    private JTable filesTable, resultsTable;
-    private JButton browseButton, removeButton, searchButton;
+    private ResizableTable filesTable, resultsTable;
+    private JButton browseButton, removeButton;
+    private ActionCancelButton searchButton;
     private JTextField phraseField;
     private SelectedFilesTableModel filesModel;
     private SearchResultTableModel resultsModel;
@@ -46,10 +49,10 @@ public class MainFrame extends JFrame {
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         browseButton = new JButton("Dodaj do listy");
-        browseButton.setPreferredSize(buttonDimension);
+        browseButton.setPreferredSize(largeButtonDimension);
         searchPanel.add(browseButton);
         removeButton = new JButton("Usuń z listy");
-        removeButton.setPreferredSize(buttonDimension);
+        removeButton.setPreferredSize(largeButtonDimension);
         searchPanel.add(removeButton);
         add(searchPanel, gbc);
 
@@ -58,8 +61,9 @@ public class MainFrame extends JFrame {
         gbc.weightx = 0.4;
         gbc.weighty = 1.0;
         filesModel = new SelectedFilesTableModel();
-        filesTable = new JTable(filesModel);
-        JScrollPane filesPane = new JScrollPane(filesTable);
+        filesTable = new ResizableTable(filesModel);
+        filesTable.adjustColumnsWidthToHeaders();
+        JScrollPane filesPane = new JScrollPane(filesTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(filesPane, gbc);
 
         gbc.gridx = 1;
@@ -84,7 +88,8 @@ public class MainFrame extends JFrame {
         resultPanel.setLayout(new BorderLayout(5, 5));
         phraseField = new JTextField();
         resultPanel.add(phraseField, BorderLayout.CENTER);
-        searchButton = new JButton("Szukaj");
+        searchButton = new ActionCancelButton("Szukaj");
+        searchButton.setPreferredSize(mediumButtonDimension);
         resultPanel.add(searchButton, BorderLayout.EAST);
         add(resultPanel, gbc);
 
@@ -93,11 +98,9 @@ public class MainFrame extends JFrame {
         gbc.weightx = 0.6;
         gbc.weighty = 1.0;
         resultsModel = new SearchResultTableModel();
-        resultsTable = new JTable(resultsModel);
-        TableColumn column = resultsTable.getColumnModel().getColumn(1);
-        column.setMinWidth(110);
-        column.setMaxWidth(110);
-        JScrollPane resultsPane = new JScrollPane(resultsTable);
+        resultsTable = new ResizableTable(resultsModel);
+        resultsTable.adjustColumnsWidthToHeaders();
+        JScrollPane resultsPane = new JScrollPane(resultsTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(resultsPane, gbc);
 
         pack();
@@ -113,8 +116,12 @@ public class MainFrame extends JFrame {
         removeButton.addActionListener(listener);
     }
 
-    public void addSearchButtonListener(ActionListener listener) {
-        searchButton.addActionListener(listener);
+    public void addPerformSearchButtonListener(ActionListener listener) {
+        searchButton.addPerformActionListener(listener);
+    }
+
+    public void addCancelSearchButtonListener(ActionListener listener) {
+        searchButton.addCancelActionListener(listener);
     }
 
     public int[] getSelectedFileIndexes() {
@@ -123,6 +130,7 @@ public class MainFrame extends JFrame {
 
     public void setFiles(java.util.List<String> files) {
         filesModel.setRows(files);
+        filesTable.adjustColumnWidth(0);
     }
 
     public String getPhraseFieldText() {
@@ -131,6 +139,7 @@ public class MainFrame extends JFrame {
 
     public void setResults(java.util.List<TextContentSearch> results) {
         resultsModel.setResults(results);
+        resultsTable.adjustColumnWidth(1);
     }
 
     public void setSearchCapacity(int value) {
@@ -141,6 +150,10 @@ public class MainFrame extends JFrame {
     public void setSearchedCount(int value) {
         this.searchedCount = value;
         updateProcessLabel();
+    }
+
+    public void setSearchButtonToSearch() {
+        searchButton.setSelected(false);
     }
 
     private void updateProcessLabel() {

@@ -13,7 +13,7 @@ public class TextContentSearch implements Comparable<TextContentSearch> {
 
     public TextContentSearch(PdfFile file, SearchPhrase phrase) {
         if (file == null) throw new IllegalArgumentException("Plik nie może być null.");
-        if (phrase == null) throw new IllegalArgumentException("Fraza wyszukiwania nie może być null");
+        if (phrase == null) throw new IllegalArgumentException("Fraza wyszukiwania nie może być null.");
         this.file = file;
         this.phrase = phrase;
     }

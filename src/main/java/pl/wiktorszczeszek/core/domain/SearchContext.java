@@ -1,19 +1,28 @@
 package pl.wiktorszczeszek.core.domain;
 
+import pl.wiktorszczeszek.core.domain.results.FileNameSearch;
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class SearchContext {
-    private final Map<PdfFile, TextContentSearch> results = new TreeMap<>();
+    private final ArrayList<PdfFile> files = new ArrayList<>();
+    private final ArrayList<FileNameSearch> fileNameResults = new ArrayList<>();
+    private final ArrayList<TextContentSearch> textContentResults = new ArrayList<>();
     private SearchPhrase searchPhrase = new SearchPhrase();
 
     public Collection<PdfFile> getFiles() {
-        return Collections.unmodifiableSet(results.keySet());
+        return Collections.unmodifiableCollection(files);
     }
 
-    public Collection<TextContentSearch> getResults() {
-        return Collections.unmodifiableCollection(results.values());
+    public Collection<FileNameSearch> getFileNameResults() {
+        return Collections.unmodifiableCollection(fileNameResults);
+    }
+
+    public Collection<TextContentSearch> getTextContentResults() {
+        return Collections.unmodifiableCollection(textContentResults);
     }
 
     public SearchPhrase getSearchPhrase() {
@@ -23,11 +32,14 @@ public class SearchContext {
     public void setSearchPhrase(SearchPhrase value) {
         if (value == null) throw new IllegalArgumentException("Fraza wyszukiwania nie może być null.");
         searchPhrase = value;
-        results.replaceAll((f, _) -> new TextContentSearch(f, value));
+        fileNameResults.replaceAll(tcs -> new FileNameSearch(tcs.getFile(), value));
+        textContentResults.replaceAll(tcs -> new TextContentSearch(tcs.getFile(), value));
     }
 
     public void clearFiles() {
-        results.clear();
+        files.clear();
+        fileNameResults.clear();
+        textContentResults.clear();
     }
 
     public int clearAndSetFiles(PdfFile[] files) {
@@ -41,8 +53,10 @@ public class SearchContext {
         int added = 0;
         for (PdfFile file : files) {
             if (file == null) throw new IllegalArgumentException("Plik nie może być null.");
-            if (results.containsKey(file)) continue;
-            results.put(file, new TextContentSearch(file, searchPhrase));
+            if (this.files.contains(file)) continue;
+            this.files.add(file);
+            fileNameResults.add(new FileNameSearch(file, searchPhrase));
+            textContentResults.add(new TextContentSearch(file, searchPhrase));
             added++;
         }
         return added;
@@ -53,17 +67,29 @@ public class SearchContext {
         int removed = 0;
         for (PdfFile file : files) {
             if (file == null) throw new IllegalArgumentException("Plik nie może być null.");
-            if (results.remove(file) != null) {
-                removed++;
-            }
+            int fileIndex = this.files.indexOf(file);
+            if (fileIndex == -1) continue;
+            this.files.remove(fileIndex);
+            fileNameResults.remove(fileIndex);
+            textContentResults.remove(fileIndex);
+            removed++;
         }
         return removed;
     }
 
-    public void updateSearchResult(TextContentSearch result) {
+    public void updateFileNameResult(FileNameSearch result) {
         if (result == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
         PdfFile file = result.getFile();
-        if (!results.containsKey(file)) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
-        results.put(file, result);
+        int fileIndex = files.indexOf(file);
+        if (fileIndex == -1) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
+        fileNameResults.set(fileIndex, result);
+    }
+
+    public void updateTextContentResult(TextContentSearch result) {
+        if (result == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
+        PdfFile file = result.getFile();
+        int fileIndex = files.indexOf(file);
+        if (fileIndex == -1) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
+        textContentResults.set(fileIndex, result);
     }
 }

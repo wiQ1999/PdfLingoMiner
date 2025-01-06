@@ -100,8 +100,8 @@ public class MainController {
             return;
         }
 
-        ArrayList<PdfFile> filesToSearch = new ArrayList<>(searchContext.getFiles());
-        if (filesToSearch.isEmpty()) {
+        ArrayList<PdfFile> files = new ArrayList<>(searchContext.getFiles());
+        if (files.isEmpty()) {
             JOptionPane.showMessageDialog(
                     mainFrame,
                     "Nie wybrano plików do przeszukania.",
@@ -116,13 +116,13 @@ public class MainController {
                 @Override
                 protected Void doInBackground() throws Exception {
                     searchService.setSearchPhrase(phrase);
-                    for (int i = 0; i < filesToSearch.size(); i++) {
+                    for (int i = 0; i < files.size(); i++) {
                         if (isCancelled()) break;
-                        PdfFile file = filesToSearch.get(i);
+                        PdfFile file = files.get(i);
                         String text = readerService.allText(file);
                         int occurrence = searchService.search(text);
                         TextContentSearch result = new TextContentSearch(file, phrase, occurrence);
-                        searchContext.updateSearchResult(result);
+                        searchContext.updateTextContentResult(result);
                         publish(i + 1);
                     }
                     return null;
@@ -136,7 +136,7 @@ public class MainController {
 
                 @Override
                 protected void done() {
-                    List<TextContentSearch> results = searchContext.getResults()
+                    List<TextContentSearch> results = searchContext.getTextContentResults()
                             .stream()
                             .filter(result -> result.getOccurrenceCount() > 0)
                             .collect(Collectors.toList());

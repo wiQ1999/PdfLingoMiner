@@ -1,21 +1,24 @@
-package pl.wiktorszczeszek.core.domain;
+package pl.wiktorszczeszek.core.domain.results;
+
+import pl.wiktorszczeszek.core.domain.PdfFile;
+import pl.wiktorszczeszek.core.domain.SearchPhrase;
 
 import java.util.Objects;
 
-public class SearchResult implements Comparable<SearchResult> {
+public class TextContentSearch implements Comparable<TextContentSearch> {
     private final PdfFile file;
     private final SearchPhrase phrase;
     private int occurrenceCount;
     private boolean isSearched;
 
-    public SearchResult(PdfFile file, SearchPhrase phrase) {
+    public TextContentSearch(PdfFile file, SearchPhrase phrase) {
         if (file == null) throw new IllegalArgumentException("Plik nie może być null.");
         if (phrase == null) throw new IllegalArgumentException("Fraza wyszukiwania nie może być null");
         this.file = file;
         this.phrase = phrase;
     }
 
-    public SearchResult(PdfFile file, SearchPhrase phrase, int occurrenceCount) {
+    public TextContentSearch(PdfFile file, SearchPhrase phrase, int occurrenceCount) {
         this(file, phrase);
         if (occurrenceCount < 0) throw new IllegalArgumentException("Liczba wystąpień nie może być ujemna.");
         this.occurrenceCount = occurrenceCount;
@@ -55,14 +58,14 @@ public class SearchResult implements Comparable<SearchResult> {
     }
 
     @Override
-    public int compareTo(SearchResult o) {
+    public int compareTo(TextContentSearch o) {
         return file.compareTo(o.getFile());
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof SearchResult other)) return false;
+        if (!(obj instanceof TextContentSearch other)) return false;
         return this.file.equals(other.file) && this.phrase.equals(other.phrase);
     }
 
@@ -73,7 +76,7 @@ public class SearchResult implements Comparable<SearchResult> {
 
     @Override
     public String toString() {
-        return "SearchResult{" +
+        return "TextContentSearch{" +
                 "file=" + file +
                 ", phrase=" + phrase +
                 ", occurrenceCount=" + occurrenceCount +

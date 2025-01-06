@@ -1,6 +1,6 @@
 package pl.wiktorszczeszek.ui.views;
 
-import pl.wiktorszczeszek.core.domain.SearchResult;
+import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
 
@@ -129,7 +129,7 @@ public class MainFrame extends JFrame {
         return phraseField.getText();
     }
 
-    public void setResults(java.util.List<SearchResult> results) {
+    public void setResults(java.util.List<TextContentSearch> results) {
         resultsModel.setResults(results);
     }
 

@@ -1,6 +1,6 @@
 package pl.wiktorszczeszek.ui.models;
 
-import pl.wiktorszczeszek.core.domain.SearchResult;
+import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -8,9 +8,9 @@ import java.util.List;
 
 public class SearchResultTableModel extends AbstractTableModel {
     private final String[] columnNames = {"Plik", "Liczba wystąpień"};
-    private List<SearchResult> results = new ArrayList<>();
+    private List<TextContentSearch> results = new ArrayList<>();
 
-    public void setResults(List<SearchResult> results) {
+    public void setResults(List<TextContentSearch> results) {
         this.results = results;
         fireTableDataChanged();
     }
@@ -40,7 +40,7 @@ public class SearchResultTableModel extends AbstractTableModel {
             return null;
         }
 
-        SearchResult result = results.get(rowIndex);
+        TextContentSearch result = results.get(rowIndex);
         switch (columnIndex) {
             case 0:
                 return result.getFile().path();

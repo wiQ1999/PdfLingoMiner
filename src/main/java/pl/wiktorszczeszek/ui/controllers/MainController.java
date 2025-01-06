@@ -3,7 +3,7 @@ package pl.wiktorszczeszek.ui.controllers;
 import pl.wiktorszczeszek.core.domain.PdfFile;
 import pl.wiktorszczeszek.core.domain.SearchContext;
 import pl.wiktorszczeszek.core.domain.SearchPhrase;
-import pl.wiktorszczeszek.core.domain.SearchResult;
+import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 import pl.wiktorszczeszek.core.services.fileLoctors.LocalFileLocator;
 import pl.wiktorszczeszek.core.services.fileReaders.TotalTextReader;
 import pl.wiktorszczeszek.core.services.searchers.PhraseCountSearcher;
@@ -113,7 +113,7 @@ public class MainController {
                         PdfFile file = filesToSearch.get(i);
                         String text = readerService.allText(file);
                         int occurrence = searchService.search(text);
-                        SearchResult result = new SearchResult(file, phrase, occurrence);
+                        TextContentSearch result = new TextContentSearch(file, phrase, occurrence);
                         searchContext.updateSearchResult(result);
                         publish(i + 1);
                     }
@@ -128,7 +128,7 @@ public class MainController {
 
                 @Override
                 protected void done() {
-                    List<SearchResult> results = searchContext.getResults()
+                    List<TextContentSearch> results = searchContext.getResults()
                             .stream()
                             .filter(result -> result.getOccurrenceCount() > 0)
                             .collect(Collectors.toList());

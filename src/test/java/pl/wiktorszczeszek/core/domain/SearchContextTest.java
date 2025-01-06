@@ -2,6 +2,7 @@ package pl.wiktorszczeszek.core.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +44,7 @@ class SearchContextTest {
     @Test
     void getResults_ShouldReturnUnmodifiableCollection() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertThrows(UnsupportedOperationException.class, () -> {
             results.clear();
         });
@@ -52,7 +53,7 @@ class SearchContextTest {
     @Test
     void getResult_ShouldReturnResultsFromContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(2, results.size());
     }
 
@@ -93,7 +94,7 @@ class SearchContextTest {
         Arrays.sort(results);
         for (int i = 0; i < files.length; i++) {
             PdfFile file = files[i];
-            SearchResult result = (SearchResult)results[i];
+            TextContentSearch result = (TextContentSearch)results[i];
             assertEquals(newPhrase, result.getPhrase());
             assertEquals(file, result.getFile());
         }
@@ -133,9 +134,9 @@ class SearchContextTest {
         assertFalse(files.contains(pdfFile1));
         assertTrue(files.contains(pdfFile2));
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(1, results.size());
-        Collection<PdfFile> resultFiles = results.stream().map(SearchResult::getFile).toList();
+        Collection<PdfFile> resultFiles = results.stream().map(TextContentSearch::getFile).toList();
         assertFalse(resultFiles.contains(pdfFile1));
         assertTrue(resultFiles.contains(pdfFile2));
     }
@@ -164,9 +165,9 @@ class SearchContextTest {
         assertTrue(files.contains(pdfFile1));
         assertTrue(files.contains(pdfFile2));
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(2, results.size());
-        Collection<PdfFile> resultFiles = results.stream().map(SearchResult::getFile).toList();
+        Collection<PdfFile> resultFiles = results.stream().map(TextContentSearch::getFile).toList();
         assertTrue(resultFiles.contains(pdfFile1));
         assertTrue(resultFiles.contains(pdfFile2));
     }
@@ -180,7 +181,7 @@ class SearchContextTest {
         Collection<PdfFile> files = searchContext.getFiles();
         assertEquals(1, files.size());
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(1, results.size());
     }
 
@@ -195,9 +196,9 @@ class SearchContextTest {
         assertTrue(files.contains(pdfFile1));
         assertTrue(files.contains(pdfFile2));
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(2, results.size());
-        Collection<PdfFile> resultFiles = results.stream().map(SearchResult::getFile).toList();
+        Collection<PdfFile> resultFiles = results.stream().map(TextContentSearch::getFile).toList();
         assertTrue(resultFiles.contains(pdfFile1));
         assertTrue(resultFiles.contains(pdfFile2));
     }
@@ -227,9 +228,9 @@ class SearchContextTest {
         assertTrue(files.contains(pdfFile1));
         assertTrue(files.contains(pdfFile2));
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(2, results.size());
-        Collection<PdfFile> resultFiles = results.stream().map(SearchResult::getFile).toList();
+        Collection<PdfFile> resultFiles = results.stream().map(TextContentSearch::getFile).toList();
         assertTrue(resultFiles.contains(pdfFile1));
         assertTrue(resultFiles.contains(pdfFile2));
     }
@@ -246,9 +247,9 @@ class SearchContextTest {
         assertFalse(files.contains(pdfFile2));
         assertTrue(files.contains(pdfFile3));
 
-        Collection<SearchResult> results = searchContext.getResults();
+        Collection<TextContentSearch> results = searchContext.getResults();
         assertEquals(1, results.size());
-        Collection<PdfFile> resultFiles = results.stream().map(SearchResult::getFile).toList();
+        Collection<PdfFile> resultFiles = results.stream().map(TextContentSearch::getFile).toList();
         assertFalse(resultFiles.contains(pdfFile1));
         assertFalse(resultFiles.contains(pdfFile2));
         assertTrue(resultFiles.contains(pdfFile3));
@@ -263,7 +264,7 @@ class SearchContextTest {
 
     @Test
     void updateSearchResult_ShouldThrowException_WhenFileNotInContext() {
-        SearchResult result = new SearchResult(pdfFile1, searchPhrase);
+        TextContentSearch result = new TextContentSearch(pdfFile1, searchPhrase);
         assertThrows(IllegalArgumentException.class, () -> {
             searchContext.updateSearchResult(result);
         });
@@ -272,10 +273,10 @@ class SearchContextTest {
     @Test
     void updateSearchResult_ShouldUpdateResultInContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1});
-        SearchResult result = new SearchResult(pdfFile1, searchPhrase, 5);
+        TextContentSearch result = new TextContentSearch(pdfFile1, searchPhrase, 5);
         searchContext.updateSearchResult(result);
 
-        SearchResult updatedResult = searchContext.getResults().stream()
+        TextContentSearch updatedResult = searchContext.getResults().stream()
                 .filter(r -> r.getFile().equals(pdfFile1))
                 .findFirst()
                 .orElse(null);

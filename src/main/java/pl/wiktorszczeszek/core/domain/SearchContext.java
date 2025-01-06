@@ -1,16 +1,18 @@
 package pl.wiktorszczeszek.core.domain;
 
+import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
+
 import java.util.*;
 
 public class SearchContext {
-    private final Map<PdfFile, SearchResult> results = new TreeMap<>();
+    private final Map<PdfFile, TextContentSearch> results = new TreeMap<>();
     private SearchPhrase searchPhrase = new SearchPhrase();
 
     public Collection<PdfFile> getFiles() {
         return Collections.unmodifiableSet(results.keySet());
     }
 
-    public Collection<SearchResult> getResults() {
+    public Collection<TextContentSearch> getResults() {
         return Collections.unmodifiableCollection(results.values());
     }
 
@@ -21,7 +23,7 @@ public class SearchContext {
     public void setSearchPhrase(SearchPhrase value) {
         if (value == null) throw new IllegalArgumentException("Fraza wyszukiwania nie może być null.");
         searchPhrase = value;
-        results.replaceAll((f, _) -> new SearchResult(f, value));
+        results.replaceAll((f, _) -> new TextContentSearch(f, value));
     }
 
     public void clearFiles() {
@@ -40,7 +42,7 @@ public class SearchContext {
         for (PdfFile file : files) {
             if (file == null) throw new IllegalArgumentException("Plik nie może być null.");
             if (results.containsKey(file)) continue;
-            results.put(file, new SearchResult(file, searchPhrase));
+            results.put(file, new TextContentSearch(file, searchPhrase));
             added++;
         }
         return added;
@@ -58,7 +60,7 @@ public class SearchContext {
         return removed;
     }
 
-    public void updateSearchResult(SearchResult result) {
+    public void updateSearchResult(TextContentSearch result) {
         if (result == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
         PdfFile file = result.getFile();
         if (!results.containsKey(file)) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");

@@ -1,9 +1,5 @@
 package pl.wiktorszczeszek.core.services.searchers;
 
-import pl.wiktorszczeszek.core.domain.SearchPhrase;
-
-public interface PhraseCountSearcher {
-    SearchPhrase getSearchPhrase();
-    void setSearchPhrase(SearchPhrase value);
+public interface PhraseCountSearcher extends PhraseSearchable {
     int search(String text);
 }

@@ -76,7 +76,7 @@ public class FileNameSearch implements Comparable<FileNameSearch> {
         return "FileNameSearch{" +
                 "file=" + file +
                 ", phrase=" + phrase +
-                ", isOccurrenceCount=" + isOccurrence +
+                ", isOccurrence=" + isOccurrence +
                 ", isSearched=" + isSearched +
                 '}';
     }

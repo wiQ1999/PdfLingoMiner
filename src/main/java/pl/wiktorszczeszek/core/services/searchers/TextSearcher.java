@@ -4,7 +4,7 @@ import pl.wiktorszczeszek.core.domain.SearchPhrase;
 
 import java.util.regex.Pattern;
 
-public class TextSearcher implements PhraseExistenceSearcher, PhraseCountSearcher {
+public class TextSearcher implements PhraseTextSearcher {
     private SearchPhrase phrase;
 
     @Override

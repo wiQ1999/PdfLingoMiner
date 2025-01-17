@@ -26,6 +26,20 @@ public class PdfFileTest {
     }
 
     @Test
+    void getName_ShouldReturnName_For0LvlFilePath() {
+        String name = "file1";
+        PdfFile pdf = new PdfFile(name + ".pdf");
+        assertEquals(name, pdf.getName());
+    }
+
+    @Test
+    void getName_ShouldReturnName_ForMultiLvlFilePath() {
+        String name = "file1";
+        PdfFile pdf = new PdfFile("C:/lvl0/lvl1/lvl3/" + name + ".pdf");
+        assertEquals(name, pdf.getName());
+    }
+
+    @Test
     void equals_ShouldReturnTrue_ForSamePath() {
         PdfFile pdfFile1 = new PdfFile("/path/to/file1.pdf");
         PdfFile pdfFile2 = new PdfFile("/PATH/TO/FILE1.pdf");

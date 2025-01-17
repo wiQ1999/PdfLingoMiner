@@ -1,10 +1,23 @@
 package pl.wiktorszczeszek.core.domain;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public record PdfFile(String path) implements Comparable<PdfFile> {
     public PdfFile(String path) {
         if (path == null) throw new IllegalArgumentException("Ścieżka do pliku nie może być null.");
         this.path = path.trim();
         if (this.path.isEmpty()) throw new IllegalArgumentException("Ścieżka do pliku nie może być pusta.");
+    }
+
+    public String getName() {
+        Path systemPath = Paths.get(path);
+        String nameWithExt = systemPath.getFileName().toString();
+        int dotIndex = nameWithExt.lastIndexOf('.');
+        if (dotIndex > 0) {
+            return nameWithExt.substring(0, dotIndex);
+        }
+        return nameWithExt;
     }
 
     @Override

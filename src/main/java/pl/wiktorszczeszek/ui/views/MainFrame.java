@@ -2,6 +2,7 @@ package pl.wiktorszczeszek.ui.views;
 
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 import pl.wiktorszczeszek.ui.buttons.ActionCancelButton;
+import pl.wiktorszczeszek.ui.models.SearchResultRow;
 import pl.wiktorszczeszek.ui.models.SearchResultTableModel;
 import pl.wiktorszczeszek.ui.models.SelectedFilesTableModel;
 import pl.wiktorszczeszek.ui.tables.ResizableTable;
@@ -137,9 +138,9 @@ public class MainFrame extends JFrame {
         return phraseField.getText();
     }
 
-    public void setResults(java.util.List<TextContentSearch> results) {
-        resultsModel.setResults(results);
-        resultsTable.adjustColumnWidth(1);
+    public void setResults(java.util.List<SearchResultRow> rows) {
+        resultsModel.setRows(rows);
+        resultsTable.adjustColumnWidth(2);
     }
 
     public void setSearchCapacity(int value) {

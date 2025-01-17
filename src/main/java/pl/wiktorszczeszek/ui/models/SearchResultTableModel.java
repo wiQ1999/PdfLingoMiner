@@ -1,23 +1,21 @@
 package pl.wiktorszczeszek.ui.models;
 
-import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
-
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"W treści", "Plik"};
-    private List<TextContentSearch> results = new ArrayList<>();
+    private final String[] columnNames = {"W nazwie", "W treści", "Plik"};
+    private List<SearchResultRow> rows = new ArrayList<>();
 
-    public void setResults(List<TextContentSearch> results) {
-        this.results = results;
+    public void setRows(List<SearchResultRow> rows) {
+        this.rows = rows;
         fireTableDataChanged();
     }
 
     @Override
     public int getRowCount() {
-        return results != null ? results.size() : 0;
+        return rows != null ? rows.size() : 0;
     }
 
     @Override
@@ -36,14 +34,15 @@ public class SearchResultTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (results == null || rowIndex < 0 || rowIndex >= results.size()) {
+        if (rows == null || rowIndex < 0 || rowIndex >= rows.size()) {
             return null;
         }
 
-        TextContentSearch result = results.get(rowIndex);
+        SearchResultRow row = rows.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> result.getOccurrenceCount();
-            case 1 -> result.getFile().path();
+            case 0 -> row.isFileNameOccurrence();
+            case 1 -> row.textOccurrenceCount();
+            case 2 -> row.file();
             default -> null;
         };
     }

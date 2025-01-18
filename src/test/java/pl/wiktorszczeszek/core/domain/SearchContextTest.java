@@ -1,7 +1,9 @@
 package pl.wiktorszczeszek.core.domain;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.wiktorszczeszek.core.domain.results.ContentSummarySearch;
 import pl.wiktorszczeszek.core.domain.results.FileNameSearch;
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 
@@ -15,19 +17,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class SearchContextTest {
-    private SearchPhrase searchPhrase;
-    private SearchContext searchContext;
-    private PdfFile pdfFile1;
-    private PdfFile pdfFile2;
-    private PdfFile pdfFile3;
+    static SearchPhrase searchPhrase;
+    static PdfFile pdfFile1;
+    static PdfFile pdfFile2;
+    static PdfFile pdfFile3;
+    SearchContext searchContext;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setUp() {
         searchPhrase = new SearchPhrase("test");
-        searchContext = new SearchContext();
         pdfFile1 = new PdfFile("/path/to/file1.pdf");
         pdfFile2 = new PdfFile("/path/to/file2.pdf");
         pdfFile3 = new PdfFile("/path/to/file3.pdf");
+    }
+
+    @BeforeEach
+    void init() {
+        searchContext = new SearchContext();
     }
 
     @Test
@@ -73,6 +79,22 @@ class SearchContextTest {
     void getTextContentResults_ShouldReturnTextContentResultsFromContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
         List<TextContentSearch> results = new ArrayList<>(searchContext.getTextContentResults());
+        assertEquals(2, results.size());
+        assertEquals(pdfFile1, results.get(0).getFile());
+        assertEquals(pdfFile2, results.get(1).getFile());
+    }
+
+    @Test
+    void getContentSummaryResults_ShouldReturnUnmodifiableCollection() {
+        searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
+        Collection<ContentSummarySearch> results = searchContext.getContentSummaryResults();
+        assertThrows(UnsupportedOperationException.class, results::clear);
+    }
+
+    @Test
+    void getContentSummaryResults_ShouldReturnContentSummaryResultsFromContext() {
+        searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
+        List<ContentSummarySearch> results = new ArrayList<>(searchContext.getContentSummaryResults());
         assertEquals(2, results.size());
         assertEquals(pdfFile1, results.get(0).getFile());
         assertEquals(pdfFile2, results.get(1).getFile());
@@ -126,10 +148,11 @@ class SearchContextTest {
     @Test
     void clearFiles_ShouldClearAllFiles() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
-
         searchContext.clearFiles();
+
         assertEquals(0, searchContext.getFiles().size());
         assertEquals(0, searchContext.getTextContentResults().size());
+        assertEquals(0, searchContext.getContentSummaryResults().size());
     }
 
     @Test
@@ -146,24 +169,13 @@ class SearchContextTest {
     void clearAndSetFiles_ShouldReplaceAllFiles() {
         searchContext.addFiles(new PdfFile[]{pdfFile1});
         int added = searchContext.clearAndSetFiles(new PdfFile[]{pdfFile2});
+        Collection<PdfFile> files = List.of(pdfFile2);
+
         assertEquals(1, added);
-
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(1, files.size());
-        assertFalse(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<FileNameSearch> fileNameResults = searchContext.getFileNameResults();
-        assertEquals(1, fileNameResults.size());
-        files = fileNameResults.stream().map(FileNameSearch::getFile).toList();
-        assertFalse(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(1, textContentResults.size());
-        files = textContentResults.stream().map(TextContentSearch::getFile).toList();
-        assertFalse(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
     }
 
     @Test
@@ -179,64 +191,39 @@ class SearchContextTest {
     @Test
     void addFiles_ShouldAddFilesToContext() {
         int added = searchContext.addFiles(new PdfFile[] {pdfFile1, pdfFile2});
+        Collection<PdfFile> files = List.of(pdfFile1, pdfFile2);
+
         assertEquals(2, added);
-
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(2, files.size());
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<FileNameSearch> fileNameResult = searchContext.getFileNameResults();
-        assertEquals(2, fileNameResult.size());
-        files = fileNameResult.stream().map(FileNameSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(2, textContentResults.size());
-        files = textContentResults.stream().map(TextContentSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
     }
 
     @Test
     void addFiles_ShouldIgnoreDuplicates() {
         searchContext.addFiles(new PdfFile[]{pdfFile1});
         int added = searchContext.addFiles(new PdfFile[] {pdfFile1});
+        Collection<PdfFile> files = List.of(pdfFile1);
+
         assertEquals(0, added);
-
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(1, files.size());
-
-        Collection<FileNameSearch> fileNameResults = searchContext.getFileNameResults();
-        assertEquals(1, fileNameResults.size());
-
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(1, textContentResults.size());
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
     }
 
     @Test
     void addFiles_ShouldAddFilesToContextAndIgnoreDuplicates() {
         searchContext.addFiles(new PdfFile[] {pdfFile1});
         int added = searchContext.addFiles(new PdfFile[] {pdfFile1, pdfFile2});
+        Collection<PdfFile> files = List.of(pdfFile1, pdfFile2);
+
         assertEquals(1, added);
-
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(2, files.size());
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<FileNameSearch> fileNameResults = searchContext.getFileNameResults();
-        assertEquals(2, fileNameResults.size());
-        files = fileNameResults.stream().map(FileNameSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(2, textContentResults.size());
-        files = textContentResults.stream().map(TextContentSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
     }
 
     @Test
@@ -253,100 +240,138 @@ class SearchContextTest {
     void removeFiles_ShouldNotRemoveAnyFile_WhenFileNotInContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2});
         int removed = searchContext.removeFiles(new PdfFile[]{pdfFile3});
+        Collection<PdfFile> files = List.of(pdfFile1, pdfFile2);
+
         assertEquals(0, removed);
-
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(2, files.size());
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<FileNameSearch> fileNameResults = searchContext.getFileNameResults();
-        assertEquals(2, fileNameResults.size());
-        files = fileNameResults.stream().map(FileNameSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
-
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(2, textContentResults.size());
-        files = textContentResults.stream().map(TextContentSearch::getFile).toList();
-        assertTrue(files.contains(pdfFile1));
-        assertTrue(files.contains(pdfFile2));
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
     }
 
     @Test
     void removeFiles_ShouldRemoveFilesFromContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1, pdfFile2, pdfFile3});
         int removed = searchContext.removeFiles(new PdfFile[]{pdfFile2, pdfFile1});
+        Collection<PdfFile> files = List.of(pdfFile3);
+
         assertEquals(2, removed);
+        assertFilesWithExistFiles(files);
+        assertFileNameResultsWithExistFiles(files);
+        assertTextContentResultsWithExistFiles(files);
+        assertContentSummaryResultsWithExistFiles(files);
+    }
 
-        Collection<PdfFile> files = searchContext.getFiles();
-        assertEquals(1, files.size());
-        assertFalse(files.contains(pdfFile1));
-        assertFalse(files.contains(pdfFile2));
-        assertTrue(files.contains(pdfFile3));
+    void assertFilesWithExistFiles(Collection<PdfFile> files) {
+        Collection<PdfFile> contextFiles = searchContext.getFiles();
+        assertEquals(files.size(), contextFiles.size());
+        for (PdfFile contextFile : contextFiles) {
+            assertTrue(files.contains(contextFile));
+        }
+    }
 
+    void assertFileNameResultsWithExistFiles(Collection<PdfFile> files) {
         Collection<FileNameSearch> fileNameResults = searchContext.getFileNameResults();
-        assertEquals(1, fileNameResults.size());
-        files = fileNameResults.stream().map(FileNameSearch::getFile).toList();
-        assertFalse(files.contains(pdfFile1));
-        assertFalse(files.contains(pdfFile2));
-        assertTrue(files.contains(pdfFile3));
+        assertEquals(files.size(), fileNameResults.size());
+        for (FileNameSearch search : fileNameResults) {
+            PdfFile searchFile = search.getFile();
+            assertTrue(files.contains(searchFile));
+        }
+    }
 
-        Collection<TextContentSearch> textContentResults = searchContext.getTextContentResults();
-        assertEquals(1, textContentResults.size());
-        files = textContentResults.stream().map(TextContentSearch::getFile).toList();
-        assertFalse(files.contains(pdfFile1));
-        assertFalse(files.contains(pdfFile2));
-        assertTrue(files.contains(pdfFile3));
+    void assertTextContentResultsWithExistFiles(Collection<PdfFile> files) {
+        Collection<TextContentSearch> TextContentResults =  searchContext.getTextContentResults();
+        assertEquals(files.size(), TextContentResults.size());
+        for (TextContentSearch search : TextContentResults) {
+            PdfFile searchFile = search.getFile();
+            assertTrue(files.contains(searchFile));
+        }
+    }
+
+    void assertContentSummaryResultsWithExistFiles(Collection<PdfFile> files) {
+        Collection<ContentSummarySearch> contentSummaryResults =  searchContext.getContentSummaryResults();
+        assertEquals(files.size(), contentSummaryResults.size());
+        for (ContentSummarySearch search : contentSummaryResults) {
+            PdfFile searchFile = search.getFile();
+            assertTrue(files.contains(searchFile));
+        }
     }
 
     @Test
-    void updateFileNameResult_ShouldThrowException_WhenResultIsNull() {
+    void updateFileNameResult_ShouldThrowException_WhenSearchIsNull() {
         assertThrows(IllegalArgumentException.class, () -> searchContext.updateFileNameResult(null));
     }
 
     @Test
     void updateFileNameResult_ShouldThrowException_WhenFileNotInContext() {
-        FileNameSearch result = new FileNameSearch(pdfFile1, searchPhrase);
-        assertThrows(IllegalArgumentException.class, () -> searchContext.updateFileNameResult(result));
+        FileNameSearch search = new FileNameSearch(pdfFile1, searchPhrase);
+        assertThrows(IllegalArgumentException.class, () -> searchContext.updateFileNameResult(search));
     }
 
     @Test
-    void updateFileNameResult_ShouldUpdateTextContentResultsInContext() {
+    void updateFileNameResult_ShouldUpdateTextContentSearchInContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1});
-        FileNameSearch result = new FileNameSearch(pdfFile1, searchPhrase, true);
-        searchContext.updateFileNameResult(result);
+        FileNameSearch search = new FileNameSearch(pdfFile1, searchPhrase, true);
+        searchContext.updateFileNameResult(search);
 
-        FileNameSearch fileName = searchContext.getFileNameResults().stream()
+        FileNameSearch contextSearch = searchContext.getFileNameResults().stream()
                 .filter(r -> r.getFile().equals(pdfFile1))
                 .findFirst()
                 .orElse(null);
-        assertNotNull(fileName);
-        assertTrue(fileName.getIsOccurrence());
+        assertNotNull(contextSearch);
+        assertEquals(search, contextSearch);
+        assertTrue(contextSearch.getIsOccurrence());
     }
 
     @Test
-    void updateTextContentResult_ShouldThrowException_WhenResultIsNull() {
+    void updateTextContentResult_ShouldThrowException_WhereSearchIsNull() {
         assertThrows(IllegalArgumentException.class, () -> searchContext.updateTextContentResult(null));
     }
 
     @Test
     void updateTextContentResult_ShouldThrowException_WhenFileNotInContext() {
-        TextContentSearch result = new TextContentSearch(pdfFile1, searchPhrase);
-        assertThrows(IllegalArgumentException.class, () -> searchContext.updateTextContentResult(result));
+        TextContentSearch search = new TextContentSearch(pdfFile1, searchPhrase);
+        assertThrows(IllegalArgumentException.class, () -> searchContext.updateTextContentResult(search));
     }
 
     @Test
-    void updateTextContentResult_ShouldUpdateTextContentResultsInContext() {
+    void updateTextContentResult_ShouldUpdateTextContentSearchInContext() {
         searchContext.addFiles(new PdfFile[]{pdfFile1});
-        TextContentSearch result = new TextContentSearch(pdfFile1, searchPhrase, 5);
-        searchContext.updateTextContentResult(result);
+        TextContentSearch search = new TextContentSearch(pdfFile1, searchPhrase, 5);
+        searchContext.updateTextContentResult(search);
 
-        TextContentSearch textContent = searchContext.getTextContentResults().stream()
+        TextContentSearch contextSearch = searchContext.getTextContentResults().stream()
                 .filter(r -> r.getFile().equals(pdfFile1))
                 .findFirst()
                 .orElse(null);
-        assertNotNull(textContent);
-        assertEquals(5, textContent.getOccurrenceCount());
+        assertNotNull(contextSearch);
+        assertEquals(search, contextSearch);
+        assertEquals(5, contextSearch.getOccurrenceCount());
+    }
+
+    @Test
+    void updateContentSummaryResult_ShouldThrowException_WhenSearchIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> searchContext.updateContentSummaryResult(null));
+    }
+
+    @Test
+    void updateContentSummaryResult_ShouldThrowException_WhenFileNotInContext() {
+        ContentSummarySearch search = new ContentSummarySearch(pdfFile1);
+        assertThrows(IllegalArgumentException.class, () -> searchContext.updateContentSummaryResult(search));
+    }
+
+    @Test
+    void updateContentSummaryResult_ShouldUpdateTextContentSearchInContext() {
+        searchContext.addFiles(new PdfFile[]{pdfFile1});
+        ContentSummarySearch search = new ContentSummarySearch(pdfFile1, "Summary test.");
+        searchContext.updateContentSummaryResult(search);
+
+        ContentSummarySearch contextSearch = searchContext.getContentSummaryResults().stream()
+                .filter(r -> r.getFile().equals(pdfFile1))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(contextSearch);
+        assertEquals(search, contextSearch);
+        assertTrue(contextSearch.getIsSearched());
     }
 }

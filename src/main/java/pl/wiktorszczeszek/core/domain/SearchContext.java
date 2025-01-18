@@ -1,5 +1,6 @@
 package pl.wiktorszczeszek.core.domain;
 
+import pl.wiktorszczeszek.core.domain.results.ContentSummarySearch;
 import pl.wiktorszczeszek.core.domain.results.FileNameSearch;
 import pl.wiktorszczeszek.core.domain.results.TextContentSearch;
 
@@ -11,6 +12,7 @@ public class SearchContext {
     private final ArrayList<PdfFile> files = new ArrayList<>();
     private final ArrayList<FileNameSearch> fileNameResults = new ArrayList<>();
     private final ArrayList<TextContentSearch> textContentResults = new ArrayList<>();
+    private final ArrayList<ContentSummarySearch> contentSummaryResults = new ArrayList<>();
     private SearchPhrase searchPhrase = new SearchPhrase();
 
     public Collection<PdfFile> getFiles() {
@@ -23,6 +25,10 @@ public class SearchContext {
 
     public Collection<TextContentSearch> getTextContentResults() {
         return Collections.unmodifiableCollection(textContentResults);
+    }
+
+    public Collection<ContentSummarySearch> getContentSummaryResults() {
+        return Collections.unmodifiableCollection(contentSummaryResults);
     }
 
     public SearchPhrase getSearchPhrase() {
@@ -40,6 +46,7 @@ public class SearchContext {
         files.clear();
         fileNameResults.clear();
         textContentResults.clear();
+        contentSummaryResults.clear();
     }
 
     public int clearAndSetFiles(PdfFile[] files) {
@@ -57,6 +64,7 @@ public class SearchContext {
             this.files.add(file);
             fileNameResults.add(new FileNameSearch(file, searchPhrase));
             textContentResults.add(new TextContentSearch(file, searchPhrase));
+            contentSummaryResults.add(new ContentSummarySearch(file));
             added++;
         }
         return added;
@@ -72,24 +80,33 @@ public class SearchContext {
             this.files.remove(fileIndex);
             fileNameResults.remove(fileIndex);
             textContentResults.remove(fileIndex);
+            contentSummaryResults.remove(fileIndex);
             removed++;
         }
         return removed;
     }
 
-    public void updateFileNameResult(FileNameSearch result) {
-        if (result == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
-        PdfFile file = result.getFile();
+    public void updateFileNameResult(FileNameSearch search) {
+        if (search == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
+        PdfFile file = search.getFile();
         int fileIndex = files.indexOf(file);
         if (fileIndex == -1) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
-        fileNameResults.set(fileIndex, result);
+        fileNameResults.set(fileIndex, search);
     }
 
-    public void updateTextContentResult(TextContentSearch result) {
-        if (result == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
-        PdfFile file = result.getFile();
+    public void updateTextContentResult(TextContentSearch search) {
+        if (search == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
+        PdfFile file = search.getFile();
         int fileIndex = files.indexOf(file);
         if (fileIndex == -1) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
-        textContentResults.set(fileIndex, result);
+        textContentResults.set(fileIndex, search);
+    }
+
+    public void updateContentSummaryResult(ContentSummarySearch search) {
+        if (search == null) throw new IllegalArgumentException("Rezultat wyszukiwania nie może być null.");
+        PdfFile file = search.getFile();
+        int fileIndex = files.indexOf(file);
+        if (fileIndex == -1) throw new IllegalArgumentException("Rezultat wyszukiwania nie istnieje w kontekście wyszukiwania.");
+        contentSummaryResults.set(fileIndex, search);
     }
 }
